@@ -1,0 +1,31 @@
+version: "3.3"
+
+services:
+
+  agrifin:
+    build:
+      context: .
+    image: moleculer-agent
+    env_file: docker-compose.env
+    environment:
+      SERVICES: '*.js'
+      PORT: 3000
+    depends_on:
+      - mongo
+    networks:
+      - internal
+    ports:
+      - "3000:3000"
+  mongo:
+    image: mongo:4
+    volumes:
+      - data:/data/db
+    networks:
+      - internal
+
+networks:
+  internal:
+
+
+volumes:
+  data:

@@ -1,0 +1,64 @@
+{
+  "name": "agrifin-services",
+  "version": "0.4.0",
+  "description": "Agrifin Services",
+  "scripts": {
+    "dev": "moleculer-runner --repl --hot --env services/**/*.service.js",
+    "start": "moleculer-runner",
+    "cli": "moleculer connect TCP",
+    "ci": "jest --watch",
+    "test": "jest --coverage",
+    "lint": "eslint services",
+    "dc:up": "docker-compose up --build -d",
+    "dc:logs": "docker-compose logs -f",
+    "dc:down": "docker-compose down"
+  },
+  "keywords": [
+    "microservices",
+    "moleculer"
+  ],
+  "author": "",
+  "devDependencies": {
+    "eslint": "^7.32.0",
+    "jest": "^27.1.0",
+    "jest-cli": "^27.1.0",
+    "moleculer-repl": "^0.6.6"
+  },
+  "dependencies": {
+    "africastalking": "^0.5.5",
+    "age-calculator": "^1.0.0",
+    "bcrypt": "^5.0.1",
+    "corestore": "^6.0.2",
+    "crypto-js": "^4.1.1",
+    "dd-trace": "^1.5.1",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.2",
+    "growr-agent-sdk": "^0.4.4",
+    "hyperbee": "^2.1.2",
+    "hypercore": "^10.0.0",
+    "hyperspace": "^3.19.0",
+    "hyperswarm": "^3.0.4",
+    "jsonwebtoken": "^8.5.1",
+    "moleculer": "^0.14.16",
+    "moleculer-apollo-server": "^0.3.6",
+    "moleculer-db": "^0.8.15",
+    "moleculer-db-adapter-mongo": "^0.4.13",
+    "moleculer-http-client": "^0.4.2",
+    "moleculer-web": "^0.10.4",
+    "otp-generator": "^4.0.0",
+    "shamirs-secret-sharing-ts": "^1.0.2",
+    "ussd-builder": "^1.2.5",
+    "ussd-menu-builder": "^1.2.0"
+  },
+  "engines": {
+    "node": ">= 12.x.x"
+  },
+  "jest": {
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "rootDir": "./services",
+    "roots": [
+      "../test"
+    ]
+  }
+}

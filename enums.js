@@ -1,0 +1,17 @@
+const ENUMS = {
+	userStates: {
+		SIGNUP: "SIGNUP",
+		REGISTERED: "REGISTERED",
+	},
+	ussdStates: {
+		NULL: null,
+		WELCOME: "WELCOME",
+		REGISTER: "REGISTER",
+		MAIN_MENU: "MAIN_MENU",
+		MAIN_MENU_SEL: "MAIN_MENU_SEL",
+		JOIN_FEDERATION_CON: "JOIN_FEDERATION_CON",
+		GET_BALANCE_FED: "GET_BALANCE_FED"
+	}
+};
+
+module.exports = ENUMS;
