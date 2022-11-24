@@ -109,6 +109,7 @@ module.exports = {
       async handler(ctx) {
         const { user } = Object.assign({}, ctx.params)
         const federationsResponse = await this.getFederations(user)
+        user.federations = [federationsResponse]
         const response =  federationsResponse.map(f => {
           return `name: ${f.name} - id: ${f.id}`
         })
@@ -126,7 +127,35 @@ module.exports = {
         const balance = await this.getBalance(user, federationId)
         return balance
       }
+    },
+
+    getMembers: {
+      params: {
+        user: 'object',
+      },
+      async handler(ctx) {
+        const { user } = Object.assign({}, ctx.params)
+        const membersResponse = await this.getMembers(user, user.federations[0][0].id)
+        const response =  membersResponse.map(m => {
+          return `name: ${m.name} - id: ${m.id}`
+        })
+        return response
+      }
+    },
+
+    sendTransfer: {
+      params: {
+        user: 'object',
+        recepient: 'string',
+        amount: 'string'
+      },
+      async handler(ctx) {
+        const { user, recepient, amount } = Object.assign({}, ctx.params)
+        const txResponse = await this.sendTransfer(user, user.federations[0][0].id, recepient, amount )
+        return txResponse
+      }
     }
+
 
 
   },
@@ -198,6 +227,32 @@ module.exports = {
         }
       })
       return response.data
+    },
+
+    async getMembers(user, federationId) {
+      const response = await axios.get(`${process.env.USER_API}/member/federation/${federationId}?guardian.equals=false`, {
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`
+        }
+      })
+      return response.data      
+    },
+
+    async sendTransfer(user, federationId, recepientId, amount) {
+
+      const tx = {
+        recipientMemberId: parseInt(recepientId),
+        description: `Send ${amount} sats to ${recepientId}`,
+        amountInSat : parseInt(amount)
+      }
+                                                                        
+      const txResponse = await axios.post(`${process.env.USER_API}/wallet/federation/${parseInt(federationId)}/transfer-mint`, tx, {
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`
+        }
+      })
+
+      return txResponse.data
     }
 
   }

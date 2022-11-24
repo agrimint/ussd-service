@@ -58,7 +58,7 @@ const USSDMessages = {
 	},
 
 	async JOIN_FEDERATION_CON(user, ctx) {
-		const text = ctx.	params.text.split("*")
+		const text = ctx.params.text.split("*")
 		const invitationCode = text[text.length - 1]
 		await ctx.call("users.joinFederation", { user, invitationCode })
 		user.ussdState = ENUMS.ussdStates.MAIN_MENU
@@ -77,8 +77,8 @@ const USSDMessages = {
 			1. Join Federation
 			2. Get Federations
 			3. Get balance
-			4. Send Money
-			5. Receive money
+			4. Send SATS
+			5. Receive SATS
 			9. Exit
 			`
 	},
@@ -102,7 +102,7 @@ const USSDMessages = {
 		const federations = await ctx.call("users.getFederations", { user })
 		user.ussdState = ENUMS.ussdStates.GET_BALANCE_FED
 		await ctx.call("users.update", { id: user._id, ...user });
-		let msg = `CON dial federation Id:
+		let msg = `CON enter federation Id:
 		`
 		federations.forEach(f => msg += `${f}
 		`)
@@ -123,6 +123,41 @@ const USSDMessages = {
 		`
 	},
 
+	async SEND_SATS(user, ctx) {
+		const members = await ctx.call("users.getMembers", { user })
+		user.ussdState = ENUMS.ussdStates.SEND_SATS_MEMBER
+		await ctx.call("users.update", { id: user._id, ...user });
+		let msg = `CON Enter Id of recepient:
+		`
+		members.forEach(m => msg += `${m}
+		`)
+
+		return msg
+	},
+
+	async SEND_SATS_MEMBER(user, ctx) {
+		user.ussdState = ENUMS.ussdStates.SEND_SATS_AMOUNT
+		await ctx.call("users.update", { id: user._id, ...user });
+		return `CON Enter Amount in SATS:`
+	},
+
+	async SEND_SATS_AMOUNT(user, ctx) {
+		const text = ctx.params.text.split("*")
+		const amount = text[text.length - 1]
+		const recepient = text[text.length - 2]
+		user.ussdState = ENUMS.ussdStates.MAIN_MENU
+		await ctx.call("users.update", { id: user._id, ...user });
+		await ctx.call("users.sendTransfer", { user, recepient, amount })
+		return `CON Transfer sent.
+		Enter: 
+		1. To Main Menu
+		9. To Exit
+		`
+	},
+
+
+
+
 	async MAIN_MENU_SEL(user, ctx) {
 		const commands = (ctx.params.text.split("*"))
 		const command = commands[commands.length - 1]
@@ -131,14 +166,14 @@ const USSDMessages = {
 			case '1': return USSDMessages.JOIN_FEDERATION(user, ctx)
 			case '2': return USSDMessages.GET_FEDERATIONS(user, ctx)
 			case '3': return USSDMessages.GET_BALANCE(user, ctx)
-			case '4':
+			case '4': return USSDMessages.SEND_SATS(user, ctx)
 			case '5':
 			case '9': return USSDMessages.SESSION_END(user, ctx, 'Bye')
 		}
 
 	},
 
-		async LOGIN_PROMPT() {
+	async LOGIN_PROMPT() {
 		return Promise.resolve("CON Enter PIN to login:");
 	},
 
@@ -276,8 +311,12 @@ module.exports = {
 				case ENUMS.ussdStates.JOIN_FEDERATION_CON: {
 					return await USSDMessages.JOIN_FEDERATION_CON(user, ctx);
 				}
-				JOIN_FEDERATION
-
+				case ENUMS.ussdStates.SEND_SATS_MEMBER: {
+					return await USSDMessages.SEND_SATS_MEMBER(user, ctx)
+				}
+				case ENUMS.ussdStates.SEND_SATS_AMOUNT: {
+					return await USSDMessages.SEND_SATS_AMOUNT(user, ctx)
+				}
 				default: {
 					return await USSDMessages.SESSION_END(user, ctx, `${user.ussdState} state not implemented yet`);
 				}
