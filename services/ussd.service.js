@@ -78,7 +78,7 @@ const USSDMessages = {
 			2. Get Federations
 			3. Get balance
 			4. Send SATS
-			5. Receive SATS
+			5. Get transactions
 			9. Exit
 			`
 	},
@@ -155,8 +155,22 @@ const USSDMessages = {
 		`
 	},
 
+	async GET_TRANSACTIONS(user, ctx) {
+		user.ussdState = ENUMS.ussdStates.MAIN_MENU
+		await ctx.call("users.update", { id: user._id, ...user });
+		let msg = `Transaction History:
+		`
+		const txHistory = await ctx.call("users.transactionHistory", { user })
+		txHistory.forEach(tx => msg += `${tx}
+		`)
 
+		msg += `Enter: 
+		1. To Main Menu
+		9. To Exit
+		`
+		return msg
 
+	},
 
 	async MAIN_MENU_SEL(user, ctx) {
 		const commands = (ctx.params.text.split("*"))
@@ -167,7 +181,7 @@ const USSDMessages = {
 			case '2': return USSDMessages.GET_FEDERATIONS(user, ctx)
 			case '3': return USSDMessages.GET_BALANCE(user, ctx)
 			case '4': return USSDMessages.SEND_SATS(user, ctx)
-			case '5':
+			case '5': return USSDMessages.GET_TRANSACTIONS(user, ctx)
 			case '9': return USSDMessages.SESSION_END(user, ctx, 'Bye')
 		}
 

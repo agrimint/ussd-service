@@ -154,6 +154,21 @@ module.exports = {
         const txResponse = await this.sendTransfer(user, user.federations[0][0].id, recepient, amount )
         return txResponse
       }
+    },
+
+    transactionHistory: {
+      params: {
+        user: 'object',
+      },
+      async handler(ctx) {
+        const { user } = Object.assign({}, ctx.params)
+        const txHistory = await this.getTransactionHistory(user, user.federations[0][0].id)
+        const response =  txHistory.map(tx => {
+          return `id: ${tx.id} - amount: ${tx.amount}`
+        })
+        return response
+      }
+
     }
 
 
@@ -221,7 +236,7 @@ module.exports = {
     },
 
     async getBalance(user, federationId) {
-      const response = await axios.get(`${process.env.USER_API}/wallet/federation/${federationId}/balance`, {
+      const response = await axios.get(`${process.env.USER_API}/wallet/federation/${parseInt(federationId)}/balance`, {
         headers: {
           Authorization: `Bearer ${user.accessToken}`
         }
